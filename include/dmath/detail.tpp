@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <utility>
 
-template <typename T, std::size_t I>
+template <typename T, std::size_t N>
 struct Vector;
 
 namespace detail
