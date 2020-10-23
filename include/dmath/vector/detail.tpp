@@ -8,16 +8,23 @@ struct Vector;
 
 namespace detail
 {
-    template <std::size_t First, std::size_t Last, typename Fn>
-    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<First == Last, void>
+    template <std::size_t First, std::size_t Last, std::size_t Step, typename Fn>
+    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<(First >= Last), void>
     {
     }
 
-    template <std::size_t First, std::size_t Last, typename Fn>
-    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t < First<Last, void>
+    template <std::size_t First, std::size_t Last, std::size_t Step, typename Fn>
+    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<(First < Last), void>
     {
         func(First);
-        static_for<First + 1, Last>(func);
+        static_for<First + Step, Last, Step>(func);
+    }
+
+    template <std::size_t First, std::size_t Last, typename Fn>
+    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<(First < Last), void>
+    {
+        func(First);
+        static_for<First + 1, Last, 1>(func);
     }
 
     // возвращает true если func() всегда true
@@ -28,20 +35,26 @@ namespace detail
     }
 
     template <std::size_t First, std::size_t Last, typename Fn>
-    constexpr auto static_for_if(const Fn &func) -> typename std::enable_if_t < First<Last, bool>
+        constexpr auto static_for_if(const Fn &func) -> typename std::enable_if_t < First<Last, bool>
     {
-        if(func(First))
+        if (func(First))
             return static_for_if<First + 1, Last>(func);
         else
             return false;
     }
 
-
     template <typename Fn, typename T, typename U, std::size_t N, std::size_t... ints>
     constexpr auto __proccess_array_scalar(const Fn &func, const Vector<T, N> &left, const U &right, std::integer_sequence<std::size_t, ints...>)
     {
-        using return_t = Vector<decltype(func(left[0], static_cast<const T&>(right))), N>;
-        return return_t(func(left[ints], static_cast<const T&>(right))...);
+        using return_t = Vector<decltype(func(left[0], static_cast<const T &>(right))), N>;
+        return return_t(func(left[ints], static_cast<const T &>(right))...);
+    }
+
+    template <typename Fn, typename T, std::size_t N, std::size_t... ints>
+    constexpr auto __proccess_array_scalar(const Fn &func, const Vector<T, N> &left, const T &right, std::integer_sequence<std::size_t, ints...>)
+    {
+        using return_t = Vector<T, N>;
+        return return_t(func(left[ints], static_cast<const T &>(right))...);
     }
 
     template <typename Fn, typename T, typename U, std::size_t N>
@@ -53,8 +66,15 @@ namespace detail
     template <typename Fn, typename T, typename U, std::size_t N, std::size_t... ints>
     constexpr auto __proccess_two_arrays(const Fn &func, const Vector<T, N> &left, const Vector<U, N> &right, std::integer_sequence<std::size_t, ints...>)
     {
-        using return_t = Vector<decltype(func(left[0], static_cast<const T&>(right[0]))), N>;
-        return return_t(func(left[ints], static_cast<const T&>(right[ints]))...);
+        using return_t = Vector<decltype(func(left[0], static_cast<const T &>(right[0]))), N>;
+        return return_t(func(left[ints], static_cast<const T &>(right[ints]))...);
+    }
+
+    template <typename Fn, typename T, std::size_t N, std::size_t... ints>
+    constexpr auto __proccess_two_arrays(const Fn &func, const Vector<T, N> &left, const Vector<T, N> &right, std::integer_sequence<std::size_t, ints...>)
+    {
+        using return_t = Vector<T, N>;
+        return return_t(func(left[ints], right[ints])...);
     }
 
     template <typename Fn, typename T, typename U, std::size_t N>
