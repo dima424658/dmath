@@ -8,41 +8,6 @@ struct Vector;
 
 namespace detail
 {
-    template <std::size_t First, std::size_t Last, std::size_t Step, typename Fn>
-    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<(First >= Last), void>
-    {
-    }
-
-    template <std::size_t First, std::size_t Last, std::size_t Step, typename Fn>
-    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<(First < Last), void>
-    {
-        func(First);
-        static_for<First + Step, Last, Step>(func);
-    }
-
-    template <std::size_t First, std::size_t Last, typename Fn>
-    constexpr auto static_for(const Fn &func) -> typename std::enable_if_t<(First < Last), void>
-    {
-        func(First);
-        static_for<First + 1, Last, 1>(func);
-    }
-
-    // возвращает true если func() всегда true
-    template <std::size_t First, std::size_t Last, typename Fn>
-    constexpr auto static_for_if(const Fn &func) -> typename std::enable_if_t<First == Last, bool>
-    {
-        return true;
-    }
-
-    template <std::size_t First, std::size_t Last, typename Fn>
-        constexpr auto static_for_if(const Fn &func) -> typename std::enable_if_t < First<Last, bool>
-    {
-        if (func(First))
-            return static_for_if<First + 1, Last>(func);
-        else
-            return false;
-    }
-
     template <typename Fn, typename T, typename U, std::size_t N, std::size_t... ints>
     constexpr auto __proccess_array_scalar(const Fn &func, const Vector<T, N> &left, const U &right, std::integer_sequence<std::size_t, ints...>)
     {

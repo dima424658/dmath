@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <algorithm>
 
+#include "../defines.hpp"
 #include "detail.tpp"
 
 template <typename T, std::size_t N>
@@ -73,65 +74,65 @@ struct Vector
     constexpr const T &operator[](size_t) const;
 
     // Assignment operators
-    constexpr Vector<T, N> &operator=(const Vector<T, N> &) = default;
+    MATH_INLINE Vector<T, N> &operator=(const Vector<T, N> &) = default;
 
     template <typename U>
-    constexpr Vector<T, N> &operator=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator=(const Vector<U, N> &);
 
     template <typename U>
-    constexpr Vector<T, N> &operator+=(const U &);
+    MATH_INLINE Vector<T, N> &operator+=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator-=(const U &);
+    MATH_INLINE Vector<T, N> &operator-=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator*=(const U &);
+    MATH_INLINE Vector<T, N> &operator*=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator/=(const U &);
+    MATH_INLINE Vector<T, N> &operator/=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator%=(const U &);
+    MATH_INLINE Vector<T, N> &operator%=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator%=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator%=(const Vector<U, N> &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator&=(const U &);
+    MATH_INLINE Vector<T, N> &operator&=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator&=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator&=(const Vector<U, N> &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator|=(const U &);
+    MATH_INLINE Vector<T, N> &operator|=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator|=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator|=(const Vector<U, N> &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator^=(const U &);
+    MATH_INLINE Vector<T, N> &operator^=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator^=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator^=(const Vector<U, N> &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator<<=(const U &);
+    MATH_INLINE Vector<T, N> &operator<<=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator<<=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator<<=(const Vector<U, N> &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator>>=(const U &);
+    MATH_INLINE Vector<T, N> &operator>>=(const U &) noexcept;
 
     template <typename U>
-    constexpr Vector<T, N> &operator>>=(const Vector<U, N> &);
+    MATH_INLINE Vector<T, N> &operator>>=(const Vector<U, N> &) noexcept;
 
     // Increment and decrement
-    constexpr Vector<T, N> &operator++();
-    constexpr Vector<T, N> operator++(int);
+    MATH_INLINE Vector<T, N> &operator++();
+    MATH_INLINE Vector<T, N> operator++(int);
 
-    constexpr Vector<T, N> &operator--();
-    constexpr Vector<T, N> operator--(int);
+    MATH_INLINE Vector<T, N> &operator--();
+    MATH_INLINE Vector<T, N> operator--(int);
 
 private:
     VectorStorage<T, N> m_data;
@@ -173,7 +174,7 @@ template <typename T, std::size_t N>
 template <typename... Args>
 constexpr Vector<T, N>::Vector(Args... args) : m_data{static_cast<typename std::enable_if<N == sizeof...(Args), T>::type>(args)...}
 {
-    static_assert(N == sizeof...(Args), "Argument size doesn't match with constructor");
+    static_assert(N == sizeof...(Args), "Argument size doesn't match constructor");
 }
 
 // -------------------------------------------------------------------------------------
@@ -296,7 +297,7 @@ constexpr const T &Vector<T, N>::operator[](size_t index) const
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator=(const Vector<U, N> &arg)
 {
     std::copy(arg.cbegin(), arg.cend(), begin());
 
@@ -305,217 +306,197 @@ constexpr Vector<T, N> &Vector<T, N>::operator=(const Vector<U, N> &arg)
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator+=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator+=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] += static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator-=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator-=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] -= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator*=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator*=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] *= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator/=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator/=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] /= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 
 template <typename T, typename U, std::size_t N>
-constexpr Vector<T, N> &operator+=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
+Vector<T, N> &operator+=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         lhs[i] += static_cast<T>(rhs[i]);
-    });
 
     return lhs;
 }
 
 template <typename T, typename U, std::size_t N>
-constexpr Vector<T, N> &operator-=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
+Vector<T, N> &operator-=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         lhs[i] -= static_cast<T>(rhs[i]);
-    });
 
     return lhs;
 }
 
 template <typename T, typename U, std::size_t N>
-constexpr Vector<T, N> &operator*=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
+Vector<T, N> &operator*=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         lhs[i] *= static_cast<T>(rhs[i]);
-    });
 
     return lhs;
 }
 
 template <typename T, typename U, std::size_t N>
-constexpr Vector<T, N> &operator/=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
+Vector<T, N> &operator/=(Vector<T, N> &lhs, const Vector<U, N> &rhs)
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         lhs[i] /= static_cast<T>(rhs[i]);
-    });
 
     return lhs;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator%=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator%=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] %= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator%=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator%=(const Vector<U, N> &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] %= static_cast<T>(arg[i]);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator&=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator&=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] &= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator&=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator&=(const Vector<U, N> &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] &= static_cast<T>(arg[i]);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator|=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator|=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] |= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator|=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator|=(const Vector<U, N> &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] |= static_cast<T>(arg[i]);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator^=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator^=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] ^= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator^=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator^=(const Vector<U, N> &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] ^= static_cast<T>(arg[i]);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator<<=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator<<=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] <<= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator<<=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator<<=(const Vector<U, N> &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] <<= static_cast<T>(arg[i]);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator>>=(const U &arg)
+Vector<T, N> &Vector<T, N>::operator>>=(const U &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] >>= static_cast<T>(arg);
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-constexpr Vector<T, N> &Vector<T, N>::operator>>=(const Vector<U, N> &arg)
+Vector<T, N> &Vector<T, N>::operator>>=(const Vector<U, N> &arg) noexcept
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i] >>= static_cast<T>(arg[i]);
-    });
 
     return *this;
 }
@@ -529,17 +510,16 @@ constexpr Vector<T, N> &Vector<T, N>::operator>>=(const Vector<U, N> &arg)
 // -------------------------------------------------------------------------------------
 
 template <typename T, std::size_t N>
-constexpr Vector<T, N> &Vector<T, N>::operator++()
+Vector<T, N> &Vector<T, N>::operator++()
 {
-    detail::static_for<0, N>([&](auto i) {
+    for(size_t i = 0; i < N; i++)
         this->m_data.data[i]++;
-    });
 
     return *this;
 }
 
 template <typename T, std::size_t N>
-constexpr Vector<T, N> Vector<T, N>::operator++(int)
+Vector<T, N> Vector<T, N>::operator++(int)
 {
     auto result(*this);
     operator++();
@@ -547,17 +527,16 @@ constexpr Vector<T, N> Vector<T, N>::operator++(int)
 }
 
 template <typename T, std::size_t N>
-constexpr Vector<T, N> &Vector<T, N>::operator--()
+Vector<T, N> &Vector<T, N>::operator--()
 {
-    detail::static_for<0, N>([&](auto i) {
-        this->m_data.data[i]--;
-    });
+    for(size_t i = 0; i < N; i++)
+        m_data.data[i]--;
 
     return *this;
 }
 
 template <typename T, std::size_t N>
-constexpr Vector<T, N> Vector<T, N>::operator--(int)
+Vector<T, N> Vector<T, N>::operator--(int)
 {
     auto result(*this);
     operator--();
@@ -731,9 +710,8 @@ constexpr auto dot(const Vector<T, N> &lhs, const Vector<U, N> &rhs)
 
     return_t result = 0;
 
-    detail::static_for<0, N>([&](auto i) {
+    for (size_t i = 0; i < N; i++)
         result += lhs[i] * static_cast<T>(rhs[i]);
-    });
 
     return result;
 }
